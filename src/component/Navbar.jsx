@@ -18,6 +18,7 @@ const Left = styled.div`
     flex: 1;
     display: flex;
     align-items: center;
+    padding: 15px;
 `
 const Language = styled.span`
     font-size: 14px;
