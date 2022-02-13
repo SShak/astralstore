@@ -54,3 +54,5 @@ export const Newsletter = () => {
     </Container>
   )
 }
+
+export default Newsletter
