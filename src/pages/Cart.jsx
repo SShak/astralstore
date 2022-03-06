@@ -11,7 +11,9 @@ import { useHistory, useNavigate, Navigate } from "react-router";
 import { useSelector } from "react-redux";
 
 
-const KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+//const KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+//const stripe = process.env.STRIPE_PUBLISHABLE_KEY;
+const stripe = 'pk_test_51KVJ0ACzqQ5Y3NqGlUuGLH2ia6hQTUwoqDC6Q4jtu2tBCoboRSWarLgKHbQRpIHwvZZfUgGmILLYT8F0eYhLIHwI00yCbAyjTG';
 
 
 const Container = styled.div`
@@ -276,7 +278,7 @@ const Cart = () => {
                 description={`Your total is $${cart.total}`}
                 amount={cart.total * 100}
                 token={onToken}
-                stripeKey={KEY}
+                stripeKey={stripe}
               >
                 <Button>CHECKOUT NOW</Button>
               </StripeCheckout>
