@@ -4,6 +4,15 @@ import Announcement from "../component/Announcement"
 import Footer from "../component/Footer"
 import Navbar from "../component/Navbar"
 import {mobile} from "../responsive"
+import StripeCheckout from "react-stripe-checkout";
+import { useEffect, useState } from "react";
+import { userRequest } from "../requestMethods";
+import { useHistory, useNavigate, Navigate } from "react-router";
+import { useSelector } from "react-redux";
+
+
+const KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+
 
 const Container = styled.div`
     
@@ -168,87 +177,115 @@ const Button = styled.button`
 `
 
 const Cart = () => {
-  return (
-    <Container> 
-        <Announcement/> 
-        <Navbar/>
-        <Wrapper>
-            <Title>Your Inner Self</Title>
-            <Top>
-                <TopButton>Gather more knowlege</TopButton>
-                <TopTexts>
-                    <TopText>Unbridled Need (2)</TopText>
-                    <TopText>Unquenched Lust (0)</TopText>
-                </TopTexts>
-                <TopButton type="filled">Manifest</TopButton>
-            </Top>
-            <Bottom>
-                <Info>
-                    <Product>
-                        <ProductDetail>
-                            <Image src="https://craft-mart.com/wp-content/uploads/2017/10/acrylic-pouring-featured-1.jpg"/>
-                            <Details>
-                                <ProductName><b>Product: </b>Forever Unfolding Self Image</ProductName>
-                                <ProductId><b>ID: </b>209384760934867</ProductId>
-                                <ProductColor color="black"/>
-                                <ProductSize><b>Size: </b>40x30</ProductSize>
-                            </Details>
-                        </ProductDetail>
-                        <PriceDetail>
-                            <ProductAmountContainer>
-                                <Add/>
-                                <ProductAmount>2</ProductAmount>
-                                <Remove/>
-                            </ProductAmountContainer>
-                            <ProductPrice>$ 4,000</ProductPrice>
-                        </PriceDetail>
-                    </Product>
-                    <Hr/>
-                    <Product>
-                        <ProductDetail>
-                            <Image src="https://craft-mart.com/wp-content/uploads/2017/10/acrylic-pouring-featured-1.jpg"/>
-                            <Details>
-                                <ProductName><b>Product: </b>Forever Unfolding Self Image</ProductName>
-                                <ProductId><b>ID: </b>209384760934867</ProductId>
-                                <ProductColor color="black"/>
-                                <ProductSize><b>Size: </b>40x30</ProductSize>
-                            </Details>
-                        </ProductDetail>
-                        <PriceDetail>
-                            <ProductAmountContainer>
-                                <Add/>
-                                <ProductAmount>2</ProductAmount>
-                                <Remove/>
-                            </ProductAmountContainer>
-                            <ProductPrice>$ 4,000</ProductPrice>
-                        </PriceDetail>
-                    </Product>
-                </Info>
-                <Summary>
-                    <SummaryTitle>All that is you</SummaryTitle>
-                    <SummaryItem>
-                        <SummaryItemText>Essence</SummaryItemText>
-                        <SummaryItemPrice>$ 8,000</SummaryItemPrice>
-                    </SummaryItem>
-                    <SummaryItem>
-                        <SummaryItemText>To Hold Near</SummaryItemText>
-                        <SummaryItemPrice>$ 500</SummaryItemPrice>
-                    </SummaryItem>
-                    <SummaryItem>
-                        <SummaryItemText>I am a kind God</SummaryItemText>
-                        <SummaryItemPrice>$ -500</SummaryItemPrice>
-                    </SummaryItem>
-                    <SummaryItem type="total">
-                        <SummaryItemText>In the end</SummaryItemText>
-                        <SummaryItemPrice>$ 8,000</SummaryItemPrice>
-                    </SummaryItem>
-                    <Button>Sign the contract</Button>
-                </Summary>
-            </Bottom>
-        </Wrapper>
-        <Footer/>
-    </Container>
-  )
-}
+    const cart = useSelector((state) => state.cart);
+    const [stripeToken, setStripeToken] = useState(null);
+    const history = useNavigate();
+  
+    const onToken = (token) => {
+      setStripeToken(token);
+    };
 
-export default Cart
+    //console.log(stripeToken);
+  
+    useEffect(() => {
+      const makeRequest = async () => {
+        try {
+          const res = await userRequest.post("/checkout/payment", {
+            tokenId: stripeToken.id,
+            amount: 500,
+          });
+          history.push("/success", {
+            stripeData: res.data,
+            products: cart, });
+        } catch {}
+      };
+      stripeToken && makeRequest();
+    }, [stripeToken, cart.total, history]);
+
+    
+    return (
+      <Container>
+        <Navbar />
+        <Announcement />
+        <Wrapper>
+          <Title>YOUR BAG</Title>
+          <Top>
+            <TopButton>CONTINUE SHOPPING</TopButton>
+            <TopTexts>
+              <TopText>Shopping Bag(2)</TopText>
+              <TopText>Your Wishlist (0)</TopText>
+            </TopTexts>
+            <TopButton type="filled">CHECKOUT NOW</TopButton>
+          </Top>
+          <Bottom>
+            <Info>
+              {cart.products.map((product) => (
+                <Product>
+                  <ProductDetail>
+                    <Image src={product.img} />
+                    <Details>
+                      <ProductName>
+                        <b>Product:</b> {product.title}
+                      </ProductName>
+                      <ProductId>
+                        <b>ID:</b> {product._id}
+                      </ProductId>
+                      <ProductColor color={product.color} />
+                      <ProductSize>
+                        <b>Size:</b> {product.size}
+                      </ProductSize>
+                    </Details>
+                  </ProductDetail>
+                  <PriceDetail>
+                    <ProductAmountContainer>
+                      <Add />
+                      <ProductAmount>{product.quantity}</ProductAmount>
+                      <Remove />
+                    </ProductAmountContainer>
+                    <ProductPrice>
+                      $ {product.price * product.quantity}
+                    </ProductPrice>
+                  </PriceDetail>
+                </Product>
+              ))}
+              <Hr />
+            </Info>
+            <Summary>
+              <SummaryTitle>ORDER SUMMARY</SummaryTitle>
+              <SummaryItem>
+                <SummaryItemText>Subtotal</SummaryItemText>
+                <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Estimated Shipping</SummaryItemText>
+                <SummaryItemPrice>$ 5.90</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Shipping Discount</SummaryItemText>
+                <SummaryItemPrice>$ -5.90</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem type="total">
+                <SummaryItemText>Total</SummaryItemText>
+                <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
+              </SummaryItem>
+              <StripeCheckout
+                name="Astral Store"
+                image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8qN6LIIsOO7VsnrDPfA0Q7Lfr1lYxy8NCvA&usqp=CAU"
+                billingAddress
+                shippingAddress
+                description={`Your total is $${cart.total}`}
+                amount={cart.total * 100}
+                token={onToken}
+                stripeKey={KEY}
+              >
+                <Button>CHECKOUT NOW</Button>
+              </StripeCheckout>
+            </Summary>
+          </Bottom>
+        </Wrapper>
+        <Footer />
+      </Container>
+    );
+  };
+  
+  export default Cart;

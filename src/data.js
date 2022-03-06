@@ -29,16 +29,19 @@ export const categories = [
       id: 1,
       img: "https://i.ytimg.com/vi/0wimMbkNqdE/maxresdefault.jpg",
       title: "All is love",
+      cat:"men"
     },
     {
       id: 2,
       img: "https://cdn.dribbble.com/users/4380793/screenshots/15329179/1.jpg",
       title: "All is life",
+      cat:"women"
     },
     {
       id: 3,
       img: "https://www.boredpanda.com/blog/wp-content/uploads/2020/04/Black_White_2020_1-5e84eac0cba04__880.jpg",
       title: "All ends soon",
+      cat:"children"
     },
   ];
 

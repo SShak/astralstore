@@ -5,6 +5,11 @@ import Footer from "../component/Footer"
 import Navbar from "../component/Navbar"
 import Newsletter from "../component/Newsletter"
 import {mobile} from "../responsive"
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { publicRequest } from "../requestMethods";
+import { addProduct } from "../redux/cartRedux";
+import { useDispatch } from "react-redux";
 
 const Container = styled.div``
 
@@ -121,43 +126,76 @@ const Button = styled.button`
 `
 
 const Product = () => {
+
+    const location = useLocation();
+    const id = location.pathname.split("/")[2];
+    const [product, setProduct] = useState({});
+    const [quantity, setQuantity] = useState(1);
+    const [color, setColor] = useState("");
+    const [size, setSize] = useState("");
+    const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const res = await publicRequest.get("/products/find/" + id);
+        setProduct(res.data);
+      } catch {}
+    };
+    getProduct();
+  }, [id]);
+
+  const handleQuantity = (type) => {
+    if (type === "dec") {
+      quantity > 1 && setQuantity(quantity - 1);
+    } else {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const handleClick = () => {
+    dispatch(
+      addProduct({ ...product, quantity, color, size })
+    );
+  };
+
+
   return (
     <Container>
         <Navbar/>
         <Announcement/>
         <Wrapper>
             <ImgContainer>
-                <Image src="https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/orange-and-purple-original-acrylic-pour-painting-david-ilzhoefer.jpg" />
+            <Image src={product.img} />
             </ImgContainer>
             <InfoContainer>
-                <Title>Plastocinetic Tirumbrance</Title>
-                <Desc>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus. Sed egestas egestas fringilla phasellus faucibus scelerisque eleifend. Pellentesque habitant morbi tristique senectus et netus. Et malesuada fames ac turpis egestas maecenas. Blandit libero volutpat sed cras ornare arcu dui. Elit ut aliquam purus sit amet luctus venenatis lectus. Nibh mauris cursus mattis molestie a iaculis at erat pellentesque. Ut etiam sit amet nisl. Dictum fusce ut placerat orci nulla pellentesque. Odio eu feugiat pretium nibh ipsum. Faucibus nisl tincidunt eget nullam non nisi est. Et molestie ac feugiat sed lectus vestibulum.</Desc>
-                <Price>$ 500</Price>
+                <Title>{product.title}</Title>
+                <Desc>{product.desc}</Desc>
+                <Price>$ {product.price}</Price>
                 <FilterContainer>
                     <Filter>
                         <FilterTitle>Color</FilterTitle>
-                        <FilterColor color="Black"/>
-                        <FilterColor color="Red"/>
-                        <FilterColor color="Yellow"/>
+                        {product.color?.map((c) => (
+                            <FilterColor color={c} key={c} onClick={() => setColor(c)} />
+                        ))}
                     </Filter>
                     <Filter>
                         <FilterTitle>Size</FilterTitle>
-                        <FilterSize>
-                            <FilterSizeOption>XS</FilterSizeOption>
-                            <FilterSizeOption>S</FilterSizeOption>
-                            <FilterSizeOption>M</FilterSizeOption>
-                            <FilterSizeOption>L</FilterSizeOption>
-                            <FilterSizeOption>XL</FilterSizeOption>
+                        <FilterSize onChange={(e) => setSize(e.target.value)}>
+                        {product.size?.map((s) => (
+                            <FilterSizeOption key={s}>{s}</FilterSizeOption>
+                        ))}
                         </FilterSize>
                     </Filter>
                 </FilterContainer>
                 <AddContainer>
                     <AmountContainer>
-                        <Remove/>
-                        <Amount>1</Amount>
-                        <Add/>
+                        <Remove onClick={() => handleQuantity("dec")} />
+                        <Amount>{quantity}</Amount>
+                        <Add onClick={() => handleQuantity("inc")} />
                     </AmountContainer>
-                    <Button>ADD TO SOUL</Button>
+                    <Button onClick={handleClick}>ADD TO SOUL</Button>
                 </AddContainer>
             </InfoContainer>
         </Wrapper>
@@ -167,4 +205,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default Product;
