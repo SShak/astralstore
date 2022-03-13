@@ -92,10 +92,10 @@ const Navbar = () => {
                 <Logo>ASTRAL MONK</Logo>
             </Center>
             <Right>
-                <Link to="/login">
+                <Link to="/register">
                 <MenuItem>Register</MenuItem>
                 </Link>
-                <Link to="/register">
+                <Link to="/login">
                 <MenuItem>Log In</MenuItem>
                 </Link>
                 <Link to="/cart">

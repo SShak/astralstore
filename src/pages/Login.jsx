@@ -1,5 +1,9 @@
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
+import { login } from "../redux/apiCalls"
 import {mobile} from "../responsive"
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
     width: 100vw;
@@ -47,6 +51,10 @@ const Button = styled.button`
     color: white;
     cursor: pointer;
     margin-bottom: 10px;
+    &:disabled{
+        color: teal;
+        cursor: not-allowed;
+    }
 `
 
 const Link = styled.a`
@@ -56,15 +64,29 @@ const Link = styled.a`
     cursor: pointer;
 `
 
+const Error = styled.span`
+    color: red;
+`
+
 const Login = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const dispatch = useDispatch();
+    const {isFetching, error} = useSelector((state) => state.user);
+
+    const handleClick = (e)=> {
+        e.preventDefault();
+        login(dispatch,{username,password});
+    };
   return (
     <Container>
                 <Wrapper>
             <Title>Return to Me</Title>
             <Form>
-                <Input placeholder="Username"/>
-                <Input placeholder="Password"/>
-                <Button>Prove Yourself</Button>
+                <Input placeholder="Username" onChange={(e)=>setUsername(e.target.value)}/>
+                <Input placeholder="Password" type="password" onChange={(e)=>setPassword(e.target.value)}/>
+                <Button onClick={handleClick} disabled={isFetching}>Prove Yourself</Button>
+                {error && <Error>You are not worthy</Error>}
                 <Link>Have you strayed from the path</Link>
                 <Link>Be Reborn</Link>
             </Form>

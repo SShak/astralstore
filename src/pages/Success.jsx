@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import { userRequest } from "../requestMethods";
 
+
 const Success = () => {
   const location = useLocation();
-  
+  /*
   const data = location.state.stripeData;
   const cart = location.state.cart;
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -31,6 +32,11 @@ const Success = () => {
     data && createOrder();
   }, [cart, data, currentUser]);
 
+//This code will go above the button once I figure out why it's not showing.  Maybe becase I do not have anyone logged in?
+  {orderId
+    ? `Order has been created successfully. Your order number is ${orderId}`
+    : `Successfull. Your order is being prepared...`}
+*/
   return (
     <div
       style={{
@@ -42,9 +48,7 @@ const Success = () => {
       }}
     >
       
-      {orderId
-        ? `Order has been created successfully. Your order number is ${orderId}`
-        : `Successfull. Your order is being prepared...`}
+      Success
         
       <button style={{ padding: 10, marginTop: 20 }}>Go to Homepage</button>
     </div>
