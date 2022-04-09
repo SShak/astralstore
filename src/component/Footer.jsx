@@ -1,4 +1,5 @@
 import { Facebook, Instagram, MailOutline, Phone, Room, Twitter } from "@material-ui/icons"
+import { Link, NavLink } from "react-router-dom"
 import styled from "styled-components"
 import {mobile} from "../responsive"
 
@@ -65,6 +66,7 @@ const List = styled.ul`
 const ListItem = styled.li`
     width: 50%;
     margin-bottom: 10px;
+    
 `
 
 const Right = styled.div`
@@ -104,7 +106,8 @@ export const Footer = () => {
         <Center>
             <Title>Useful Links</Title>
             <List>
-                <ListItem>Home</ListItem>
+                <ListItem> <NavLink to={"/"}>Home</NavLink> </ListItem>
+
                 <ListItem>Cart</ListItem>
                 <ListItem>My Account</ListItem>
                 <ListItem>Order Tracking</ListItem>
